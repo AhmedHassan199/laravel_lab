@@ -23,13 +23,17 @@
             <tr>
                 <td>{{$post['id']}}</td>
                 <td>{{$post['title']}}</td>
-                <td>{{$post['posted_by']}}</td>
-                <td>{{$post['created_at']}}</td>
+                <td>{{$post->user->name ?? 'Not Found'}}</td>
+                <td>{{$post->created_at->format('Y-m-d')}}</td>
                 <td>
 {{--                    href="/posts/{{$post['id']}}"--}}
                     <a href="{{route('posts.show', $post['id'])}}" class="btn btn-info">View</a>
                     <a href="{{route('posts.edit', $post['id'])}}" class="btn btn-primary">Edit</a>
-                    <a href="#" class="btn btn-danger">Delete</a>
+                    <form style="display: inline" action="{{route('posts.destroy', $post['id'])}}" method="post">
+                        @csrf
+                        @method("delete")
+                    <button onclick="return confirm('Are you sure?')"  class="btn btn-danger">Delete</button>
+                    </form>
                 </td>
             </tr>
         @endforeach
@@ -37,5 +41,5 @@
 
         </tbody>
     </table>
-
+    {{$posts->links('pagination::bootstrap-4')}}
 @endsection

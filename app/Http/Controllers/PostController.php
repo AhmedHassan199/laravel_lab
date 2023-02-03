@@ -2,29 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Comment;
 use Illuminate\Http\Request;
+use App\Models\Post;
+use App\Http\Requests\StorePostRequest;
 
 class PostController extends Controller
 {
     public function index()
     {
-        $allPosts = [
-            [
-                'id' => 1,
-                'title' => 'laravel',
-                'description' => 'hello this is laravel post',
-                'posted_by' => 'Ahmed',
-                'created_at' => '2022-01-28 10:05:00',
-            ],
-            [
-                'id' => 2,
-                'title' => 'php',
-                'description' => 'hello this is php post',
-                'posted_by' => 'Mohamed',
-                'created_at' => '2022-01-30 10:05:00',
-            ],
-        ];
-//        dd($allPosts);
+        //select * from posts;
+        $allPosts = Post::paginate(5);
         return view('posts.index',[
             'posts' => $allPosts,
         ]);
@@ -32,57 +21,82 @@ class PostController extends Controller
 
     public function create()
     {
-        return view('posts.create');
-    }
+        $users = User::get();
 
-    public function store()
+        return view('posts.create',[
+            'users' => $users,
+        ]);    }
+
+    public function store(StorePostRequest $request)
     {
-        return redirect('/posts') ;
+
         // return 'insert in database';
+        $data = $request->all();
+        $title = $data['title'];
+        $description = $data['description'];
+        // $userId = $data['post_creator'];
+        // dd( $title ,$description ,$userId) ;
+        Post::create([
+            'title' => $title,
+            'description' => $description,
+            'user_id' =>$request->userId,
+        ]);
+              return redirect('/posts') ;
+
     }
 
     public function show($postId)
     {
-        // dd($postId);
-        return view('posts.show');
+        $allComments = Comment::get();
+        $users = User::get();
+        $post = Post::find($postId);
+        // dd( $users);
+        // dd($post);
+        return view('posts.show',[
+            'posts'=> $post,
+            'users' => $users,
+            'comments' => $allComments,
+             'id' => $postId
+        ]);
     }
     public function edit($id )
     {
-        $allPosts = [
-            [
-                'id' => 1,
-                'title' => 'laravel',
-                'description' => 'hello this is laravel post',
-                'posted_by' => 'Ahmed',
-                'created_at' => '2022-01-28 10:05:00',
-            ],
-            [
-                'id' => 2,
-                'title' => 'php',
-                'description' => 'hello this is php post',
-                'posted_by' => 'Mohamed',
-                'created_at' => '2022-01-30 10:05:00',
-            ],
-        ];
-
-        // dd($postId);
+        $users = User::get();
+        $post = Post::find($id);
+        // dd($users);
+        // dd($post);
         // return $id ;
-        return view('posts.edit', [
-            'post' => $allPosts[0],
+        return view('posts.edit',[
+            'posts'=> $post,
+            'users' => $users,
+
         ]);
     }
-    public function update($id)
+    public function update($id ,StorePostRequest $request)
     {
         // dd($postId);
-        return $id ;
         // return view('posts.update');
+
+        $post = Post::find($id);
+        $post->update([
+            'title' =>$request->title,
+            'description' =>$request->description,
+            'user_id' =>$request->userId,
+
+        ]);
+        return redirect('/posts') ;
+
     }
 
     public function destroy($id)
     {
+        $post = Post::find($id);
+        $post->delete();
+
+        return redirect('/posts') ;
+
         // dd($postId);
-        // return $id ;
-        return view('posts.delete');
+
     }
 
 }
