@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Requests;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -24,8 +26,11 @@ class StorePostRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => ['required' ,'unique:posts', 'min:3' ],
+            'title' => ['required' ,Rule::unique('posts', 'title')->ignore($this->post), 'min:3' ],
             'description' => ['required', 'min:5'],
+            'user_id'=>['exist:App\model\user,id'],
+            'image' => 'required|mimes:jpg,png,jpeg,gif,svg|max:2048',
+
         ];
     }
 }

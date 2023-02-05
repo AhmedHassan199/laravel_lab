@@ -12,6 +12,7 @@ class PostController extends Controller
 {
     public function index()
     {
+        // $allPosts = Post::with('user')->all();
         //select * from posts;
         $allPosts = Post::paginate(5);
         return view('posts.index',[
@@ -29,29 +30,29 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request)
     {
-
+        // image
+        $image_path = $request->file('image')->store('image', 'public');
         // return 'insert in database';
         $data = $request->all();
         $title = $data['title'];
         $description = $data['description'];
-        // $userId = $data['post_creator'];
-        // dd( $title ,$description ,$userId) ;
         Post::create([
             'title' => $title,
             'description' => $description,
             'user_id' =>$request->userId,
+            'image' => $image_path,
         ]);
+        session()->flash('success', 'Image Upload successfully');
+
               return redirect('/posts') ;
 
     }
 
     public function show($postId)
     {
-        $allComments = Comment::get();
+        $allComments = Comment::all();
         $users = User::get();
         $post = Post::find($postId);
-        // dd( $users);
-        // dd($post);
         return view('posts.show',[
             'posts'=> $post,
             'users' => $users,
@@ -63,9 +64,6 @@ class PostController extends Controller
     {
         $users = User::get();
         $post = Post::find($id);
-        // dd($users);
-        // dd($post);
-        // return $id ;
         return view('posts.edit',[
             'posts'=> $post,
             'users' => $users,
@@ -74,14 +72,13 @@ class PostController extends Controller
     }
     public function update($id ,StorePostRequest $request)
     {
-        // dd($postId);
-        // return view('posts.update');
-
+        $image_path = $request->file('image')->store('image', 'public');
         $post = Post::find($id);
         $post->update([
             'title' =>$request->title,
             'description' =>$request->description,
             'user_id' =>$request->userId,
+            'image'=>$image_path
 
         ]);
         return redirect('/posts') ;
@@ -95,7 +92,6 @@ class PostController extends Controller
 
         return redirect('/posts') ;
 
-        // dd($postId);
 
     }
 

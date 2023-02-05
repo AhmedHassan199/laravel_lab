@@ -20,18 +20,24 @@
             <input type="text" name="title" class="form-control" value="{{$posts['title']}}" >
         </div>
         <div class="mb-3">
+            <label class="form-label">Image</label>
+            <img src="{{Storage::disk('local')->url($posts->image)}}" alt="" srcset="" width="100px" height="100px">;    </div>
+
+            <input type="file" name="image" class="form-control"  >
+        </div>
+        <div class="mb-3">
             <label  class="form-label">Description</label>
             <textarea name="description" class="form-control">{{$posts['description']}} </textarea>
         </div>
         <div class="mb-3">
             <label class="form-check-label">Post Creator</label>
-
             <select name="userId" class="form-control">
                 @foreach($users as $user)
                     <option value="{{$user->id}}"@if($user->id ==$posts->user_id) selected @endif>{{$user->name}}</option>
                 @endforeach
             </select>
         </div>
+
         <button type="submit" class="btn btn-success">Submit</button>
     </form>
 @endsection

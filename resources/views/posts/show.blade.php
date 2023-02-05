@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('title') create @endsection
-
 @section('content')
 <div class="card">
     <h5 class="card-header">Post info</h5>
@@ -10,10 +9,8 @@
       <p class="card-text">{{$posts->title}}</p>
       <h5 class="card-title"> Description </h5>
       <p class="card-text">{{$posts->description}}</p>
-    </div>
+      <img src="{{Storage::disk('local')->url($posts->image)}}" alt="" srcset="" width="100px" height="100px">;    </div>
   </div>
-
-
   <div class="card">
     <h5 class="card-header">Post creater info</h5>
     <div class="card-body">
@@ -23,7 +20,6 @@
             <option value="{{$user->id}}"@if($user->id ==$posts->user_id) selected @else hidden @endif>{{$user->name}}</option>
         @endforeach
     </select>
-
       <h5 class="card-title">Email</h5>
       <select name="userId" class="form-control">
         @foreach($users as $user)
@@ -34,11 +30,7 @@
       <a href="{{route('posts.index')}}" class="btn btn-primary">Go back</a>
     </div>
   </div>
-
-
-
-
-  <form method="POST" action="{{route('posts.comments',$id)}}">
+  <form method="POST" action="{{route('comments.store',$id)}}">
     @csrf
     <div class="mb-3">
       <label for="exampleInputPassword1" class="form-label">Add your comment</label>
@@ -52,16 +44,15 @@
       comment
     </div>
    <div class="card-body" >
-      <h5 class="card-title">Special title treatment</h5>
 
        <p class="card-text">{{$comment['comment_body']}}</p>
-      <a href="#" class="btn btn-primary">Go somewhere</a>
+       <p class="card-text">created at {{$comment['created_at']->format('d F Y')}}</p>
+       <form style="display: inline" action="{{route('comments.destroy', $comment['id'])}}" method="post">
+        @csrf
+        @method("delete")
+    <button onclick="return confirm('Are you sure?')"  class="btn btn-danger">Delete</button>
+    </form>
     </div>
   </div>
-
-  {{-- <option @if($comment->post_id ==$posts->id) selected @else hidden @endif>{{$comment->comment_body}}</option> --}}
-
   @endforeach
-
-
 @endsection

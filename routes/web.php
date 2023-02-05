@@ -1,9 +1,10 @@
 <?php
+use Laravel\Socialite\Facades\Socialite;
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
-
+use App\Models\user;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -30,8 +31,56 @@ Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.e
 Route::PUT('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
 Route::DELETE('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy')->middleware('auth');
 // comment
-Route::post('/comments/{id}', [CommentController::class, 'store'])->name('posts.comments');
+Route::post('/comments/{id}', [CommentController::class, 'store'])->name('comments.store');
+Route::DELETE('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+
+// Githup
+Route::get('/auth/redirect', function () {
+    return Socialite::driver('github')->redirect();
+});
+
+Route::get('/auth/callback', function () {
+
+    $githubUser = Socialite::driver('github')->user();
+    // dd($githubUser);
+
+    $user = User::updateOrCreate(
+     [
+        'name' => $githubUser->nickname,
+        'email' => $githubUser->email,
+    ]);
+
+    Auth::login($user);
+
+    return redirect('/posts');
+
+
+});
+
+//goggle
+Route::get('/auth/redirect', function () {
+    return Socialite::driver('google')->redirect();
+});
+
+Route::get('/auth/callback', function () {
+
+    $User = Socialite::driver('google')->user();
+    // dd($githubUser);
+
+    $user = User::updateOrCreate(
+     [
+        'name' => $User->nickname,
+        'email' => $User->email,
+    ]);
+
+    Auth::login($user);
+
+    return redirect('/posts');
+
+
+});
